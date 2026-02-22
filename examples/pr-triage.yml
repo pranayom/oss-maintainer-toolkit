@@ -1,5 +1,5 @@
 # Copy this file to .github/workflows/pr-triage.yml in your repository.
-# See: https://github.com/pranayom/security_pr
+# See: https://github.com/pranayom/oss-maintainer-toolkit
 
 name: PR Triage
 
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pranayom/security_pr@v1
+      - uses: pranayom/oss-maintainer-toolkit@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 

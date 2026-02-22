@@ -1,10 +1,15 @@
 # OSS Maintainer Toolkit
 
+[![PyPI version](https://img.shields.io/pypi/v/oss-maintainer-toolkit)](https://pypi.org/project/oss-maintainer-toolkit/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![CI](https://github.com/pranayom/oss-maintainer-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/pranayom/oss-maintainer-toolkit/actions/workflows/ci.yml)
+
 Automated triage for PRs, issues, contributors, and review queues. A free GitHub Action and CLI built on a three-tier pipeline: embedding-based dedup, heuristic scoring, and optional LLM vision alignment.
 
 **Every PR gets a verdict: `FAST_TRACK`, `REVIEW_REQUIRED`, or `RECOMMEND_CLOSE`.**
 
-Tested on [OpenClaw](https://github.com/openclaw/openclaw) (3,368 open PRs): cut the maintainer review queue by 36% and found 6% duplicate PRs in 30 seconds. [See the full report.](https://gist.github.com/pranayom)
+Tested on [OpenClaw](https://github.com/openclaw/openclaw) (3,368 open PRs): cut the maintainer review queue by 36% and found 6% duplicate PRs in 30 seconds. See the [evidence section](#evidence-openclaw-triage) below.
 
 ---
 
@@ -178,13 +183,13 @@ When the action runs on a PR, it posts a comment like:
 ## Roadmap
 
 - **PR Triage** — Shipped (v0.3.0)
-- **Issue Triage** — Dedup and classify issues
-- **Issue-to-PR Linking** — Suggest which PRs address which issues
-- **Label Automation** — Auto-classify PRs/issues into project label taxonomies
-- **Contributor Profiles** — Track contribution patterns and reliability
-- **Review Routing** — Suggest reviewers based on file ownership
-- **Smart Stale Detection** — Semantic staleness (superseded, merged elsewhere, blocked)
-- **Cross-PR Conflict Detection** — Surface PRs with overlapping file changes
+- **Issue Triage** — Shipped (v0.4.0)
+- **Issue-to-PR Linking** — Shipped (v0.4.0)
+- **Label Automation** — Shipped (v0.4.0)
+- **Contributor Profiles** — Shipped (v0.4.0)
+- **Review Routing** — Shipped (v0.4.0)
+- **Smart Stale Detection** — Shipped (v0.4.0)
+- **Cross-PR Conflict Detection** — Shipped (v0.4.0)
 
 ---
 
