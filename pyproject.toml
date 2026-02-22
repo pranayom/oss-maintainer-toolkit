@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "oss-maintainer-toolkit"
-version = "0.4.0"
+dynamic = ["version"]
 description = "OSS Maintainer Toolkit — automated triage for PRs, issues, contributors, and review queues"
 readme = "README.md"
 license = "MIT"
@@ -44,6 +44,7 @@ dev = [
     "respx>=0.20",
     "build>=1.0",
     "twine>=5.0",
+    "hatchling>=1.0",
 ]
 
 [project.urls]
@@ -53,6 +54,27 @@ Issues = "https://github.com/pranayom/oss-maintainer-toolkit/issues"
 
 [project.scripts]
 maintainer = "oss_maintainer_toolkit.cli.main:app"
+
+[tool.hatch.version]
+path = "oss_maintainer_toolkit/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "oss_maintainer_toolkit/scanners",
+    "oss_maintainer_toolkit/analysis",
+    "oss_maintainer_toolkit/cve",
+    ".claude",
+    "reports",
+    "scripts",
+    "vision_documents",
+    "tests",
+    "HANDOVER*.md",
+    "CLAUDE.md",
+    "Plan.md",
+    "Progress.md",
+    "Learnings.md",
+    "idea.md",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["oss_maintainer_toolkit"]
