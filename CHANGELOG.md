@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.4.1] - 2026-02-21
+
+### Fixed
+- Clean sdist: exclude frozen modules, dev files, and internal tooling from source distribution
+- Dynamic versioning: single source of truth in `__init__.py` via hatch
+- Add `py.typed` marker for PEP 561 type checking support
+- Add `__main__.py` for `python -m oss_maintainer_toolkit`
+- Add hatchling to dev dependencies for local builds
+- Add CHANGELOG.md
+
 ## [0.4.0] - 2026-02-21
 
 ### Added
