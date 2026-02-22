@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
+import time
+
 import httpx
 
 from oss_maintainer_toolkit.gatekeeper.config import gatekeeper_settings
@@ -132,20 +135,49 @@ class GitHubClient:
             params={"state": "open", "per_page": "100"},
         )
 
+    async def _search_request(
+        self, params: dict, *, max_retries: int = 3,
+    ) -> httpx.Response | None:
+        """Make a search API request with rate-limit-aware retry.
+
+        GitHub's search API has a separate 30 req/min limit.  On 403/429
+        this helper sleeps until the reset window and retries.  Returns
+        None only after exhausting all retries.
+        """
+        for attempt in range(max_retries):
+            resp = await self.client.get("/search/issues", params=params)
+
+            if resp.status_code == 422:
+                return None  # bad query — no point retrying
+
+            if resp.status_code in (403, 429):
+                # Determine wait time from Retry-After or x-ratelimit-reset
+                retry_after = resp.headers.get("retry-after")
+                if retry_after:
+                    wait = int(retry_after)
+                else:
+                    reset_ts = int(resp.headers.get("x-ratelimit-reset", "0"))
+                    wait = max(reset_ts - int(time.time()), 1) if reset_ts else 5
+                # Cap at 65 s (one search window) to avoid unbounded waits
+                wait = min(wait, 65)
+                await asyncio.sleep(wait)
+                continue
+
+            resp.raise_for_status()
+            return resp
+
+        return None
+
     async def count_user_prs(self, owner: str, repo: str, username: str) -> int:
         """Count merged PRs by a user in a repo via Search API.
 
-        Returns 0 on rate limit or other errors to avoid blocking ingestion.
+        Returns 0 on unrecoverable errors to avoid blocking ingestion.
         """
         query = f"repo:{owner}/{repo} author:{username} type:pr is:merged"
         try:
-            resp = await self.client.get(
-                "/search/issues",
-                params={"q": query, "per_page": "1"},
-            )
-            if resp.status_code in (403, 422, 429):
+            resp = await self._search_request({"q": query, "per_page": "1"})
+            if resp is None:
                 return 0
-            resp.raise_for_status()
             return resp.json().get("total_count", 0)
         except (httpx.HTTPStatusError, httpx.TimeoutException):
             return 0
@@ -237,20 +269,18 @@ class GitHubClient:
         """Search for PRs by a user in a repo via Search API.
 
         Returns raw search result items (limited to max_results).
-        Returns empty list on rate limit or errors.
+        Retries on search rate limits (403/429) before giving up.
         """
         query = f"repo:{owner}/{repo} author:{username} type:pr"
         try:
             results: list[dict] = []
             page = 1
             while len(results) < max_results:
-                resp = await self.client.get(
-                    "/search/issues",
-                    params={"q": query, "per_page": "100", "page": str(page)},
+                resp = await self._search_request(
+                    {"q": query, "per_page": "100", "page": str(page)},
                 )
-                if resp.status_code in (403, 422, 429):
+                if resp is None:
                     break
-                resp.raise_for_status()
                 items = resp.json().get("items", [])
                 if not items:
                     break
@@ -284,17 +314,13 @@ class GitHubClient:
     async def count_user_issues(self, owner: str, repo: str, username: str) -> int:
         """Count issues authored by a user in a repo via Search API.
 
-        Returns 0 on rate limit or other errors to avoid blocking ingestion.
+        Returns 0 on unrecoverable errors to avoid blocking ingestion.
         """
         query = f"repo:{owner}/{repo} author:{username} type:issue"
         try:
-            resp = await self.client.get(
-                "/search/issues",
-                params={"q": query, "per_page": "1"},
-            )
-            if resp.status_code in (403, 422, 429):
+            resp = await self._search_request({"q": query, "per_page": "1"})
+            if resp is None:
                 return 0
-            resp.raise_for_status()
             return resp.json().get("total_count", 0)
         except (httpx.HTTPStatusError, httpx.TimeoutException):
             return 0
