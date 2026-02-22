@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.4.2] - 2026-02-21
+
+### Removed
+- Frozen security tools (scan_vulnerabilities, trace_data_flow, check_cve) from MCP server
+- Frozen security tool tests
+
+### Added
+- README badges (PyPI, Python, License, CI)
+- CONTRIBUTING.md
+
+### Fixed
+- Broken gist link in README replaced with anchor to evidence section
+- Stale `security_pr` repo references in example workflow
+- Roadmap updated: all 8 features marked as shipped
+
 ## [0.4.1] - 2026-02-21
 
 ### Fixed
